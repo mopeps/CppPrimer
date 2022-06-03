@@ -1,0 +1,148 @@
+#+TITLE: Ch2 Variables and Basic types
+
+* Primitive Built-in Types
+
+** Arithmetic Types
+
+| Type        | Meaning                           | Minimum Size          |
+|-------------+-----------------------------------+-----------------------|
+| bool        | boolean                           | NA                    |
+| char        | character                         | 8 bits                |
+| wchar_t     | wide character                    | 16 bits               |
+| char16_t    | Unicode character                 | 16 bits               |
+| char32_t    | Unicode character                 | 32 bits               |
+| short       | short integer                     | 16 bits               |
+| int         | integer                           | 16 bits               |
+| long        | long integer                      | 32 bits               |
+| long long   | long integer                      | 64 bits               |
+| float       | single-precision floating point   | 6 significant digits  |
+| double      | double-precision floating-point   | 10 significant digits |
+| long double | extended-precision floating point | 10 significant digits |
+
+
+** Type conversion
+
+#+begin_src C++
+  bool b = 42; // b is true
+  int i = b; // i has value 1
+  i = 3.14; // i has value 3
+  double pi = i; // pi has value 3.0
+  unsigned char c = -1; // assuming 8-bit chars, c has value 255
+  signed char c2 = 256; // assuming 8-bit chars, the value of c2 is undefined
+  int num = -1;
+  unsigned numlessone = num; // assuming 32-bits ints, numlessone = 2 ^ 32
+
+#+end_src
+
+** Literals
+
+Values known as /literals/ are self-evident values, i.e., 42. Every literals has a type and their
+form and value determines their type.
+The table Above describes some of c++ literal types.
+
+#+begin_src C++
+	'a' // char literal
+  "Howdie" // string literal
+	42 /* decimal */ O52 /* octal */ 0x2A /* hexadecimal */
+	nullptr // pointer literal
+#+end_src
+
+** Escape sequences
+Some characters have no visible image( they are nonprintable), and others have special meaning. We
+can't use these special characters directly, instead, we have to add a escape sequence to represent
+them. These sequences start with a backslash =\=
+
+| meaning         | chars |
+|-----------------+-------|
+| newline         | \n    |
+| vertical tab    | \v    |
+| backslash       | \\    |
+| carriage return | \r    |
+| horizontal tab  | \t    |
+| backspace       | \b    |
+| question mark   | \?    |
+| formfeed        | \f    |
+| alert(bell)     | \a    |
+| double quote    | \"    |
+| single quote    | \'    |
+
+* Variables
+
+** Definitions and initializations
+Variables provide us with named storage that our program can manipulate. You can picture them as tiny
+boxes with labes, in which you store data.
+
+#+begin_example
+
+|             |
+| "Something" |  ----> is a variable where we store a value of a given type.
+| ___________ |
+
+#+end_example
+
+
+Variables are defined and initialized. Defining a variable means specifying the variable's type,
+name and ending the line with a =;=, and initializing consists in specifying the value it will store
+at the moment it is created.
+
+Some examples are:
+
+#+begin_src C++
+
+	int sum = 0, value, // sum, value, and units_sold have type
+	  int units_sold = 0; // sum and units_sold have initial value 0
+	Sales_item item; // item has type Sales_item (see § 1.5.1 (p. 20))
+	// string is a library type, representing a variable-length sequence of characters
+	std::string book("0-201-78345-X"); // book initialized from string literal
+
+#+end_src
+
+it's important to understand that =initialization= is not the same as assignment. Initialization
+happens when a variable is given a value when it is created. Assignmend obliterates an object's
+current value and replaces that value with a new one.
+
+When we define a variable without an initializer, the variable is default initialized. Such
+variables are given the “default” value. What that default value is depends on the type of the
+variable and may also depend on where the variable is defined.
+
+The value of an object of built-in type that is not explicitly initialized depends on where it is
+defined. Variables defined outside any function body are initialized to zero.
+
+** Declarations
+
+Let's say we want to write our C++ code into several files. This is commonly known as =separate compilation=
+
+Separate compilation lets us split our programs into several files, each of which can be compiled
+independently. To support this, C++ distinguishes between declarations and definitions.
+
+A =declaration= makes a name known to the program. A file that wants to use a name defined  elsewhere
+includes a declaration for that name. A definition creates the associated entity
+i.e.:
+#+begin_src C++
+
+  extern int i; // declares but does not define i
+  int j; // declares and defines j
+
+#+end_src
+
+
+Any declaration that includes an explicit initializer is a definition. We can provide an
+initializer on a variable defined as extern, but doing so overrides the extern. An extern that has
+an initializer is a definition:
+
+#+begin_src C++
+
+  extern double pi = 3.1416; // definition
+
+#+end_src
+
+
+* Compound Types
+
+** References
+
+** Pointers
+
+* Consts
+
+* Dealing with types
