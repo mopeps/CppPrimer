@@ -66,3 +66,486 @@ Along with defining how objects are initialized, a class also defines operations
 the class type can perform. 
 
 *** Reading and writing
+| Operation     | Description                                                               |
+|---------------+---------------------------------------------------------------------------|
+| = os << s =   | Writes s onto output stream os. Returns os.                               |
+| =is >> s=       | Reads whitespace-separated string from is into s. Returns is              |
+| =getline(is,s)= | Reads a line of input is into s. Return is.                               |
+| =s.empty()=     | returns true if s is empty; otherwise returns false.                      |
+| =s.size()=      | returns the number of characters in s.                                    |
+| =s[n]=          | Returns a reference to the char at position n in s; postitions start at 0 |
+| =s1 + s2=       | Returns a string that is the concatenation of s1 and s2.                  |
+| =s1 = s2=       | Replaces characters in s1 with a copy of s2.                              |
+| =s1 !=s2=       | Equality is case-sensitive                                                |
+| =<,<=, >,>=     | Comparisons are case-sensitive and use dictionary ordering                |
+| = s1 == s2 =  | The strings s1 and s2 are equal if they contain the same characters       |
+
+**** Reading an Uknown number of strings
+
+In *chapter 1* we wrote a program that reads an uknown number of =int= values.
+We can write a similar program that reads =strings= instead:
+
+#+begin_src C++
+	int main()
+	{
+	  std::string word;
+	  while (std::cin >> word) // read until end-of-file
+		std::cout << word << std::endl; // write each word followed by a new line
+	  return 0;
+	}
+#+end_src
+
+**** Using getline to Read an Entire line
+
+Sometime we don't want to ignore the whitespace between words in our input. In such cases, it is,
+better to use the =getline= function instead of the =>>= operator. The =getline= reads the given stream
+until a new line is found (/not including the newline/). If the first character of the stream is a
+new line, then it returns the empty string.
+
+Just like the input operator, =getline= returns its =istream= argument. As a result, we can use it as
+a condition the same way we use the input operator.
+
+The previous program could be rewritten like:
+
+#+begin_src C++
+  int main() {
+	std::string line;
+	// read input a line at a time until end-of-file
+	while (std::getline(std::cin, line))
+	  std::cout << line << std::endl;
+	return 0;
+  }
+#+end_src
+
+**** The string =empty= and =size= Operations
+
+Now, what if we want to output only the lines which are not empty. Luckily we have the =empty=
+operation which ,as one would expect, returns a =bool= indicating whether the string is empty.
+
+The way we would use this operation on the previous example would be:
+
+#+begin_src C++
+  int main(){
+	std::string line;
+	// read input a line at a time and discard blank lines
+	while (std::getline(std::cin, line))
+	  if(!line.empty())
+		std::cout << line << std::endl;
+	return 0;
+  }
+#+end_src
+
+And if we only want lines longer than 80 characters, we would write:
+
+#+begin_src C++
+  int main(){
+	std::string line;
+	// read input a line at a time and discard lines smaller than 80 characters
+	while (std::getline(std::cin, line))
+	  if(line.size() > 80)
+		std::cout << line << std::endl;
+	return 0;
+  }
+
+#+end_src
+
+**** The string::syze_type Type
+
+When one thinks of the =size= of a string, we think of an *int* or a *unsigned*. However, =s.size= returns
+a =string::size_type= value.
+
+The type *size_type* is a companion type of the string library, we don't know the precise type of
+=string::size_type=, but we do know that it is an unsigned type big enough to hld the size of any
+=string.=
+
+**** Comparing strings
+
+The =string= class defines several operator that compare strings, such as:
+- The Equality Operators ( == and   ! =)
+- The relational Operators, <, <=, >, >= (which use a case-sensitive dictionary strategy to compare)
+
+**** Assignment for strings
+
+#+begin_src C++
+  std::string = st1(10, 'c'), st2; // st1 is cccccccccc; st2 is an empty string
+  st1 = st2; // assignment: replace contents of st1 with a copy of st2
+			// both st1 and st2 are now the empty string
+#+end_src
+
+**** Adding two strings
+Adding two strings result in the concatenation of the two of them.
+
+#+begin_src C++
+  std::string s1 = "hello, ", s2 = "world!\n";
+  std::string s3 = s1 + s2; // s3 is "hello, world!\n"
+  s1 += s2; // it is equivalent to s1 = s1 + s2
+#+end_src
+
+**** Adding Literals with strings
+
+When adding literals and strings, one of the two operands on each =+= must be of =string= type:
+
+#+begin_src C++
+  std::string s1 = "hello", s2 = "world"; // no punctuation in s1 or s2
+  std::string s3 = s1 + ", " + s2 + '\n'; // This is ok
+  std::string s4 = "hello, " + "world\n"; // For the love of god, don't do this
+  std::string s5 = s1 + ", " + "world"; // it's ok, since it evaluates like (s1 + ", ") + "world"
+										// so each + has a string operand
+  std::string s6 = "hello" + ", " + s2; // Fails, since the first + doesn't have a string operand
+#+end_src
+
+*** Dealing with the Characters in a string
+
+When working with strings, we usually want to check specific characters inside them.We'll
+see how to gain access to them, and how to find out/ change the characteristics of a character.
+
+**** Use the C++ version of C library Headers
+
+In addition to the facilities defined specifically for C++, C++ incorporates its own C library.
+Usually Headers in C have names on the form =name.h= . The C++ versions of this library are named
+=cname=. They remove the .h and precede the name with a c to indicate that the header is part of
+the C library.
+
+=cctype= containse the same as =ctype.h=, but in a form that it is more appropiate for C++ programs.
+
+**** Processing Every Character? Try Range-Based for!
+
+Introduced by the C++11 standard, this statement iterates through the elements in a given sequence
+and performs some operation on each value on that sequence. Its form  is the following:
+
+#+begin_src
+
+for ( declaration : expression )
+	statement
+
+#+end_src
+
+- *Expression*:
+  is an object of a type that represents a sequence
+- *Declaration*:
+  defines the variable that we'll use to access the underlying elements in the sequence.
+
+On each iteration, the variable in declaration is initialized from the value of the next element in
+expression.
+
+As we know already, a string is a sequence of characters, so if we want to output each character of a
+string we would do the following:
+
+#+begin_src C++
+  std::string s("Hello World!!");
+
+  for (auto c: s)
+	std::cout << c << std::endl;
+
+#+end_src
+
+**** Using a Range for to Change the Characters in a string
+
+If we want to change the value of the characters in a string, we must define the loop variable
+as a reference type.
+
+Now we want to turn all the characters to uppercase, we would use the =toupper= method from *cctype*
+and write the following:
+
+#+begin_src C++
+  #include <cctype>
+  std::string s("Hello World!!");
+
+  for (auto &c: s)
+	c = std::toupper(c);
+
+  std::cout << s << std::endl;
+#+end_src
+
+**** Processing only some characters?
+
+For that we use the subscript operator (the =[]= operator) which takes a =string::size_type= and allows
+us to access a particular position in the string. the s[0] returns the first character and
+s[s.size() - 1] returns the last.
+
+** Library Vector Type
+
+A *vector* is a collection of objects of the same type. Every object has an associated
+index, which gives access to that object. To use a vector in C++ we must include the
+appropiate header.
+
+A vector is a *class template*. Now, writing a template requires a deep understanding
+of C++, but we can use them without knowing how to write them. A template is not
+really a class or a function, it's more of a instruction for the compiler which uses
+to create class or functions of an instantiated type we specify in our program. In
+the case of vector, we have to tell the compiler which will be the type of the objects
+contained inside of the vector.
+
+
+#+begin_src C++
+  #include <vector>
+  using std::vector;
+
+  vector<int> ivec;              // ivec holds objects of type int
+  vector<sales_items> Sales_vec; // holds Sales_items
+  vector<vector<std::string>> file;   //vector whose elements are vectors of strings
+#+end_src
+
+*** Definition and initialization
+
+We can default initialize a vector, which creates an empty vector, this is of no
+little use, since we can add elements to a vector at run time. This is one of the
+most common ways to use vectors.
+
+#+begin_src C++
+  
+  #include <vector>
+  using std::vector;
+
+  vector<int> ivec;           //initially empty
+  //give ivec some values
+  vector<int> ivec2(ivec);    //copy elements of ivec into ivec2
+  vector<int> ivec3 = ivec;   //copy elements of ivec into ivec3
+  vector<std::string> svec(ivec2); //error: svec holds strings, not ints
+#+end_src
+
+**** List Initializing a vector
+
+Under the C++11 standard, we can list initialize a vector from a list of zero or
+more initial element values enclosed in curly braces:
+
+#+begin_src C++
+
+  std::vector<std::string> articles = {"a", "an", "the"};
+
+#+end_src
+
+There are 3 restrictions when initializing vectors:
+- We can only supply a single initializer
+- When we supply an in-class initializer, we must either use copy initialization(=)
+  or use the curly braces.
+- We can supply a list of element values only by using list initialization.
+
+#+begin_src C++
+  #include <vector>
+  using std::vector;
+
+  vector<std::string> v1{"a", "an", "the"}; // list initialization
+  vector<std::string> v2("a", "an", "the"); // error Creating a Specified Number of Elements
+
+#+end_src
+
+**** Creating a specified number of elements
+
+We can also initialize vectors from a count and an element value using parentheses
+instead of curly braces.
+
+#+begin_src C++
+
+  std::vector<int> ivec(10, -1); // we create a vector containing 10 int elements of value -1
+
+  std::vector<int> zero_vec(10); // if we omit the value, it defaults to 0
+
+  std::vector<std::string> svec(10, "hi!"); // ten strings; each element is "hi!"
+
+  std::vector<std::string> empty_string_vec(10); // ten strings; each element is ""
+#+end_src
+
+if we use curly braces instead of parentheses, depending on the way we provide the
+initial values, they can be interpreted as a list initialize. The way this works is
+by checking first if the values passed can be used to list initialize the vector,
+otherwise, the other ways to initialize will be tried.
+
+#+begin_src C++
+  std::vector<std::string> v5{"hi"}; // list initialization: v5 has one element
+
+  std::vector<std::string> v6("hi"); // error: can’t construct a vector from a string literal
+
+  std::vector<std::string> v7{10}; // v7 has ten default-initialized elements
+
+  std::vector<std::string> v8{10, "hi"}; // v8 has ten elements with value "hi"
+#+end_src
+
+*** Adding Elements to a Vector
+
+Having the ability to dynamically add or remove elements is pretty useful, since
+we might have a huge list of elements that we can't afford to write as a list-initialize
+for our vector.
+
+The way we do this operations are by using the member functions of the vector class
+called =push_back= and =pop_back=.
+
+**** push_back
+As its name implies, it pushes a value onto the back of the vector at runtime.
+we can use it to add the elements from 0 to 99 to a vector sequentially or to
+read an uknown number of words from a text.
+
+#+begin_src C++
+
+  std::vector<int> v2; // empty vector
+  for (int i = 0; i != 100; ++i)
+  v2.push_back(i); // append sequential integers to v2
+
+  //at end of loop v2 has 100 elements, values 0 . . . 99
+
+#+end_src
+
+#+begin_src C++
+
+  // read words from the standard input and store them as elements in a vector
+  std::string word;
+  std::vector<std::string> text; // empty vector
+  while (std::cin >> word) {
+	text.push_back(word); // append word to text
+  }
+#+end_src
+
+*** Other vector operations
+
+We access the elements of a vector the same way that we access the characters
+in a string: through their position in the vector. For example, we can use a
+range for to process all the elements in a vector:
+
+#+begin_src C++
+
+  std::vector<int> v{1,2,3,4,5,6,7,8,9};
+
+  for (auto &i : v) //for each element in v (note: i is a reference)
+	i *= i; // square the element value
+
+  for (auto i : v) // for each element in v
+	std::cout << i << " "; //print the element
+  std::cout << endl;
+
+#+end_src
+
+We also have the =empty= and =size= members. =empty= returns a bool indicating if
+the vector contains any object inside, and =size= returns a size_type defined
+by the corresponding vector.
+
+The equality and relational operators of a vector work similarly to the ones
+for strings. And the comparison operator depend on wether or not the types of
+the objects contained inside the vector can be compared.
+
+**** Computing a vector index
+
+Vectors also have the =subscript= operator, which, behaves in a similar way to
+the subscript operator of strings. Something important to note, is that you
+can't add elements to a vector using out of bound values with the subscript
+operator and the assignment operator. if we want to do that we use the =push_back=
+member.
+
+** Introducing Iterators
+Although we could use subscripts to access the characters of a string or the elements
+inside a vector, there is a more general mechanism - known as *iterators* - that we can
+use for the same purpose. It is important to know that all of the library containers
+(at least up until C++11) have iterators, but only a few of them have the subscript
+operator.
+
+Iterators give us indirect access to an object. In the case of an iterator, that object
+is an element in a container or a character in a *string*.
+
+*** Using Iterators
+Types that have iterators have members that return iterators. In particular these types
+have members named =begin= and =end=. The *begin* member returns an iterator that denotes the
+first element (or first character), if there is one, and the *end* member returns the last
+element:
+
+#+begin_src C++
+  
+  // with auto the compiler determines the type of b and e
+  // b denotes the first element in v and e denotes the last element in v
+  auto b = v.begin() , e = v.end(); // b and e have the same type
+
+#+end_src
+
+The iterator returned by the *end* member is an iterator positioned "one past the end" of
+the associated container. This iterator denotes a nonexistent element of the container, it
+is mostly used to mark when we have processed all of the elements in a container. If the
+container is empty, then *begin* and *end* have the same value.
+
+**** Iterator Operations
+
+Iterators only have a few operations
+| Operation      | Description                                                          |
+|----------------+----------------------------------------------------------------------|
+| =*iter=          | Return a reference to the element denoted by the iterator iter       |
+| =iter->mem=      | Dereferences iter and fetches the memeber named *mem* from the         |
+|                | underlying element. Equivalent to =(*iter).mem=                        |
+| =++iter=         | Increments =iter= to refer to the next element in the container        |
+| =--iter=         | Decrements =iter= to refer to the previous element in the container    |
+| iter1 == iter2 | Compares two iterators for equality(inequality). Two iterators are   |
+| iter1 != iter2 | equal if they denote the same element or if they are the off-the-end |
+|                | iterator for the same container                                      |
+|                |                                                                      |
+
+**** Moving iterators from one element to Another
+Iterators, like subscripts, use the increment(++) operator to move from one element
+to the next, and the decrement(--) operator to move to the previous element.
+**** Iterator Types
+The iterator type depends on the type of the container which defines it, and as we
+do not know the precise type's of a vector's or string's size_type member, we generally
+don't know the precise type of an iterator.
+
+We can have =const_iterator= and =iterator= as types that represent the actual iterator
+types. both of them behave similarly to =const pointers= and regular =pointers=.
+
+**** The begin and end Operations
+The type returned by the =begin= and =end= members depend on whether or not the object
+on which they operate is =const=.
+
+#+begin_src C++
+vector<int> v;
+const vector<int> cv;
+auto it1 = v.begin();  //it1 has type vector<int>::iterator
+auto it2 = cv.begin(); //it2 has type vector<int>::const_iterator
+#+end_src
+
+The C++11 introduces =cbegin= and =cend= to let us ask specifically for const_iterators
+
+#+begin_src C++
+auto it3 = v.cbegin(); //it3 has type vector<int>::const_iterator
+auto itend3 = v.cend(); //itend3 has type vector<int>::const_iterator
+#+end_src
+
+**** Combining Dereference and Member Access
+When dereferencing an iterator, we get the object that the iterator denotes. If
+that object has a class type, we may want to access a member of that object. For
+example, we might have a =vector= of =strings= and we might need to know whether a given
+element is empty or not. Assuming =it= is an iterator into this vector, we can check
+whether the =string= that =it= denotes is empty as follows:
+
+#+begin_src C++
+	(*it).empty() //dereferences it and calls the member empty on the resulting object
+
+	*it.empty() // error: attempts to fetch the member named empty from it
+	            // but it is an iterator and has no member named empty
+#+end_src
+
+To simplify expressions such as this one, C++ defines the arrow operator, which
+combines the dereference and member access into a single operator, so now it would
+be like:
+#+begin_src C++
+it->empty(); //dereferences it and calls the member empty on the resulting object
+#+end_src
+
+**** Some vector Operations invalidate iterators
+The fact that =vectors= can grow dynamically in size can create conflicts when working
+with iterators.
+
+*** Iterator Arithmetic
+| OP            | Description                                                                  |
+|---------------+------------------------------------------------------------------------------|
+| =iter + n=      | Adding(subtracting) an integral value n to (from) an iterator yields an      |
+| =iter - n=      | iterator that many elements forward (backward) within the container          |
+|               | The resulting iterator must denote elements in, or one past the end of,      |
+|               | the same container.                                                          |
+| iter1 += n    | Compound-assignment for iterator addition and subtraction.Assigns to =iter1=   |
+| iter1 -= n    | the value of adding =n= to, or substracting =n= from, =iter1=.                     |
+| iter1 - iter2 | Substracting two iterators yields the number that when added to the          |
+|               | right hand iterator yields the left-hand iterator, The iterator must         |
+|               | denote elements in or one past the end of, the same container.               |
+| >, >=, <, <=  | Relational operators on iterators. One iterator is less than another if it   |
+|               | refers to an element that appears in the container before the one referred   |
+|               | to by the other iterator. The iterators must denote elements in, or one past |
+|               | the end of, the same container                                              |
+
+** Arrays
+I assume the reader knows C, and i won't be talking about arrays.
+
+
