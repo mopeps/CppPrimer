@@ -6,13 +6,73 @@ The result of such an expression is the value of the variable or litearl. More
 complicated expressions are formed from an *operator* and one or more operands.
 
 * Fundamentals
-
 ** Basic Concepts
-
+There are both *unary operators* and *binary operators*.
+- Unary  -> 1 operand
+- Binary -> 2 operands (who would have guessed it)
 *** Grouping Operators and Operands
+One has to understand the precedence an associativity of the operators when grouping them to
+predict correctly the result.
 *** Operand Conversion
+Operands are often converted from one type to another, This usually happens to reach a common
+type between operands.
 *** Overloaded Operators
+It's giving an alternative meaning to an existing operator symbol, depending on the operand on
+which is being called.
 *** Lvalues and Rvalues
+Every expression in C++ is either an *rvalue* /are-value/ or an *lvalue* /ell-value/ . The names are
+inherited from C and originally were a simple mnemonic. lvalues could stand on the left-hand of an assignment whereas rvalues could not.
+
+In C++ things get complicated, lvalues experssions yield an object or a function. However, som
+lvalues, such as const objects, may not be the left-hand operand of an assignment.
+To make it simple:
+*lvalues* -> we use the object's identity ( its location in memory )
+*rvalue*  -> we use the object's value.
+We can use lvalues when an rvalue is required but not the other way around.
 
 ** Precedence and Associativity
+An expression with two or more operators is a *compound expression*. When evaluating one, the
+operands are grouped to the operators and precedence and associativity determine how they are grouped.
+Operands of operators with higher precedence group more tightly than operands of operators at
+lower precedence. Associativity determines how to group when the precedence is the same.
+ie: multiplication and division have the same precedence, but they have a higher precedence
+than addition.
+*** Parentheses Override Precedence and associativity  
+We can override the normal grouping with parentheses.
+#+begin_src C++
+  cout << (6 + 3) * (4 / 2 + 2) << endl; // prints 36
+  cout << ((6 + 3) * 4) / 2 + 2 << endl; // prints 20
+  cout << 6 + 3 * 4 / (2 + 2) << endl;   // prints 9
+#+end_src 
 
+
+*** When precedence and associativity matter
+precedence and associativity affect the correctness of our programs. For example, it can
+determine whether we access the position p and increment its value by 4, or whether we access
+the direction p with an offset of 4 bytes.
+
+** Order of Evaluation
+Precedence specifies how operands are grouped but it says nothing about the order in which
+operands are evaluated. For operators that do not specify evaluation order, it is an error for
+an expression to refer to and change the same object. Expressions that do so, have undefined behaviour.
+*** Order of evaluation, precedence, and associativity
+Order of operand evaluation is independent of precedence and associativity. In an expression
+such as =f() + g() * h() + j();=
+- Precedence guarantees that the results of g() and h() are multiplied.
+- Associativity guarantees that the result of f() is added to the product of g() and h() and
+  that the result of that addition is added to the value of j().
+- There are no guarantees as to the order in which these functions are called.
+* Arithmetic Operators
+Not much to talk about except for the appliance of lvalues and rvalues.
+* Logical and Relational Operators
+
+*** Logical =and= and =or= operators
+*** Logical =not=
+*** The relational operators
+*** Equality tests and the =bool= literals
+* Assignment Operators
+*** Assignment is right associative
+*** Assignment has low precedence
+*** Beware of confusing equality and assignment operators
+*** Compound assignment operators
+* Increment and Decrement Operators
